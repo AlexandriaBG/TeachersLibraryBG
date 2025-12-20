@@ -3,7 +3,7 @@ name: Auto Index Generator
 on:
   push:
     paths:
-      - 'Александрийската библиотека/**'
+      - 'Александрийската_библиотека/**'
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
       - name: Generate HTML indexes
         uses: ludeeus/action-folder-index@v1
         with:
-          base: 'Александрийската библиотека'
+          base: 'Александрийската_библиотека'
       - name: Commit index files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
