@@ -9,13 +9,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # 1. Checkout the repository
       - uses: actions/checkout@v3
+
+      # 2. Generate HTML indexes for all folders
       - name: Generate HTML indexes
         uses: ludeeus/action-folder-index@v1
         with:
           base: 'Library_of_Alexandria'
+          title: 'Учителска библиотека' # Optional, can stay in Bulgarian
+          exclude: '' # leave blank to include everything
+          show_size: true
+          show_modified: true
+
+      # 3. Commit the generated index.html files back to repo
       - name: Commit index files
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Auto-update indexes"
+          branch: main
+          author_name: "GitHub Actions"
+          author_email: "actions@github.com"
+
 
