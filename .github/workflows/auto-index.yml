@@ -1,0 +1,21 @@
+name: Auto Index Generator
+
+on:
+  push:
+    paths:
+      - 'Александрийската библиотека/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Generate HTML indexes
+        uses: ludeeus/action-folder-index@v1
+        with:
+          base: 'Александрийската библиотека'
+      - name: Commit index files
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "Auto-update indexes"
+
