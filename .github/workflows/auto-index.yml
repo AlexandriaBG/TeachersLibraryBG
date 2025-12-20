@@ -1,8 +1,25 @@
+name: Auto Index Generator
+
+on:
+  push:
+    paths:
+      - 'Library_of_Alexandria/**'
+
 jobs:
-  generate-index:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: gacts/directory-listing@v1
-        with:
-          target: ./Library_of_Alexandria
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Generate directory listings
+      uses: jayanta525/github-pages-directory-listing@v4.0.0
+      with:
+        folder: 'Library_of_Alexandria'
+
+    - name: Commit generated index files
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Auto-update directory indexes"
+        branch: main
