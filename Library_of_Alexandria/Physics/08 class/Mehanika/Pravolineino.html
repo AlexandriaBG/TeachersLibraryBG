@@ -1,0 +1,142 @@
+<!-- Created by Silvy Evtimov Banzhov, 12.2025 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title> Праволинейно равномерно движение </title>
+<style>
+  body { font-family: sans-serif; margin:0; padding:0; display:flex; height:100vh; }
+  #controls { width:40%; background:#f0f0f0; padding:40px; box-sizing:border-box; }
+  #controls h2 { font-size:32px; margin-bottom:30px; }
+  .control-label { display:block; margin:20px 0 10px; font-size:28px; }
+  .control-input { font-size:28px; width:100%; padding:8px; }
+  #controls button { font-size:28px; padding:10px 20px; margin-top:20px; cursor:pointer; }
+  #info { font-size:28px; margin-top:20px; }
+  #note { font-size:22px; margin-top:20px; font-style:italic; color:#333; }
+  #visual { width:60%; background:#eef; display:flex; justify-content:center; align-items:center; border-left:3px solid #ccc; position: relative; }
+  #canvas { border:1px solid #333; background:#eef; width:90%; height:90%; }
+  #velocityBox {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: rgba(255,255,255,0.8);
+    border:1px solid #333;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-weight:bold;
+  }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <h2 id="title"> Праволинейно равномерно движение </h2>
+
+  <label class="control-label" id="labelSpeed">Speed (m/s) / Скорост (м/с):
+    <input type="number" id="speed" class="control-input" value="2">
+  </label>
+
+  <label class="control-label" id="labelDistance">Distance (m) / Разстояние (м):
+    <input type="number" id="distance" class="control-input" value="10">
+  </label>
+
+  <button id="startBtn" onclick="startMotion()">Start / Старт</button>
+  <button id="langBtn" onclick="toggleLanguage()">BG/EN</button>
+
+  <p id="info"></p>
+  <p id="note">Uniform motion: equal distances per second, no resistance / Равноускорено движение: еднакви разстояния за секунда, без съпротивление</p>
+</div>
+
+<div id="visual">
+  <canvas id="canvas" width="800" height="200"></canvas>
+  <div id="velocityBox">v: 0.00 m/s</div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const velocityBox = document.getElementById('velocityBox');
+let x=0, animation;
+let lang='EN';
+
+function startMotion(){
+    cancelAnimationFrame(animation);
+    x=0;
+
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    const speed = parseFloat(document.getElementById('speed').value);
+    const distance = parseFloat(document.getElementById('distance').value);
+    const scale = canvas.width / distance;
+    const dt = 0.02;
+    let t=0;
+    const info = document.getElementById('info');
+
+    function animate(){
+        x += speed*dt;
+        t += dt;
+
+        // Stop at end
+        if(x >= distance){
+            x = distance;
+            info.innerHTML = lang==='EN' ? `Arrived! Time: ${t.toFixed(2)} s` : `Пристигна! Време: ${t.toFixed(2)} с`;
+            draw();
+            return;
+        }
+
+        draw();
+        animation = requestAnimationFrame(animate);
+    }
+
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        // --- Marker every second ---
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 2;
+        ctx.font = '18px sans-serif';
+        ctx.fillStyle = '#000';
+        for(let s=1;s<=Math.ceil(distance/speed);s++){
+            let pos = s*speed*scale;
+            ctx.beginPath();
+            ctx.moveTo(pos, 0);
+            ctx.lineTo(pos, canvas.height);
+            ctx.stroke();
+            ctx.fillText(`${s}s`, pos+2, 20);
+        }
+
+        // --- Moving block ---
+        ctx.fillStyle='blue';
+        ctx.fillRect(x*scale, canvas.height/2-15, 30, 30);
+
+        // --- Velocity box ---
+        velocityBox.innerText = `v: ${speed.toFixed(2)} ${lang==='EN'?'m/s':'м/с'}`;
+    }
+
+    animate();
+}
+
+// --- Language toggle ---
+function toggleLanguage(){
+    if(lang==='EN'){
+        lang='BG';
+        document.getElementById('title').innerText='Равноускорено движение';
+        document.getElementById('labelSpeed').innerHTML='Скорост (м/с): <input type="number" id="speed" class="control-input" value="'+document.getElementById('speed').value+'">';
+        document.getElementById('labelDistance').innerHTML='Разстояние (м): <input type="number" id="distance" class="control-input" value="'+document.getElementById('distance').value+'">';
+        document.getElementById('startBtn').innerText='Старт';
+        document.getElementById('langBtn').innerText='EN';
+        document.getElementById('note').innerText='Равноускорено движение: еднакви разстояния за секунда, без съпротивление';
+    } else {
+        lang='EN';
+        document.getElementById('title').innerText='Uniform Motion Simulator';
+        document.getElementById('labelSpeed').innerHTML='Speed (m/s): <input type="number" id="speed" class="control-input" value="'+document.getElementById('speed').value+'">';
+        document.getElementById('labelDistance').innerHTML='Distance (m): <input type="number" id="distance" class="control-input" value="'+document.getElementById('distance').value+'">';
+        document.getElementById('startBtn').innerText='Start';
+        document.getElementById('langBtn').innerText='BG';
+        document.getElementById('note').innerText='Uniform motion: equal distances per second, no resistance';
+    }
+}
+</script>
+</body>
+</html>
