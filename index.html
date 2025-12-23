@@ -3,41 +3,106 @@
 <head>
 <meta charset="UTF-8">
 <title>Учителската библиотека</title>
+
 <style>
+/* ===== Base ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
 body {
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111;
+
   background-image: url("bgimage/BGimage.png");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
 }
+
+/* ===== Layout container ===== */
+.main {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 24px 32px;
+
+  background: rgba(255, 255, 255, 0.88);
+  border-radius: 6px;
+}
+
+/* ===== Headings ===== */
+h1 {
+  margin-top: 0;
+  font-size: 2.2rem;
+}
+
+.subtitle {
+  font-style: italic;
+  margin-bottom: 24px;
+}
+
+/* ===== Category list ===== */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin: 10px 0;
+}
+
+a {
+  font-size: 1.15rem;
+  text-decoration: none;
+  color: #003366;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Footer ===== */
+footer {
+  margin-top: 32px;
+  font-size: 0.85rem;
+  color: #333;
+}
 </style>
- 
 </head>
+
 <body>
-<h1>Учителската библиотека/TeacherLibraryBG</h1>
-<i><p>*Кликнете на една от категориите:</p></i>
-<ul>
-  <h2><li><a href="Library_of_Alexandria/BG/">Български език и литература</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Bio/">Биология и здравно образование</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Geo/">География и икономика</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Others/">Езици и други предмети</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Art/">Изобразително изкуство</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/IT/">Информационни технологии</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/History/">История и цивилизация</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Math/">Математика</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Music/">Музика</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/1-4grade/">Начално образование 1-4 клас</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Physics/">Физика и астрономия</a></li></h2>
-  <h2><li><a href="Library_of_Alexandria/Chemistry/">Химия и опазване на околната среда</a></li></h2>
-</ul>
-<hr>
-<small>Последно обновено: 17:17 23/12/2025</small>
-<small><i>*натиснете бутон Ctrl докато кликате - всяко кликнато ще излиза в нов раздел в браузъра</i>i></small>
+
+<div class="main">
+  <h1>Учителската библиотека</h1>
+  <div class="subtitle">TeacherLibraryBG</div>
+
+  <p><i>*Кликнете на една от категориите:</i></p>
+
+  <ul>
+    <li><a href="Library_of_Alexandria/BG/">Български език и литература</a></li>
+    <li><a href="Library_of_Alexandria/Bio/">Биология и здравно образование</a></li>
+    <li><a href="Library_of_Alexandria/Geo/">География и икономика</a></li>
+    <li><a href="Library_of_Alexandria/History/">История и цивилизация</a></li>
+    <li><a href="Library_of_Alexandria/Math/">Математика</a></li>
+    <li><a href="Library_of_Alexandria/Physics/">Физика и астрономия</a></li>
+    <li><a href="Library_of_Alexandria/Chemistry/">Химия и опазване на околната среда</a></li>
+    <li><a href="Library_of_Alexandria/IT/">Информационни технологии</a></li>
+    <li><a href="Library_of_Alexandria/Art/">Изобразително изкуство</a></li>
+    <li><a href="Library_of_Alexandria/Music/">Музика</a></li>
+    <li><a href="Library_of_Alexandria/1-4grade/">Начално образование (1–4 клас)</a></li>
+    <li><a href="Library_of_Alexandria/Others/">Езици и други предмети</a></li>
+  </ul>
+
+  <footer>
+    <hr>
+    <div>Последно обновено: 23.12.2025</div>
+    <div><i>*Ctrl + клик → отваряне в нов раздел</i></div>
+  </footer>
+</div>
+
 </body>
 </html>
-
-
-
-
-
