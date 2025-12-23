@@ -10,30 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+    - name: Checkout
+      uses: actions/checkout@v3
 
-      - name: Delete old index files
-        run: find Library_of_Alexandria -name "index.html" -type f -delete
+    - name: Generate directory listings
+      uses: jayanta525/github-pages-directory-listing@v4.0.0
+      with:
+        folder: 'Library_of_Alexandria'
 
-      - name: Generate directory listings
-        uses: jayanta525/github-pages-directory-listing@v4.0.0
-        with:
-          folder: 'Library_of_Alexandria'
-
-      - name: Inject folder/file JS into generated indexes
-        run: |
-          JS='<script>
-          document.querySelectorAll("a").forEach(a => {
-            const href = a.getAttribute("href");
-            if(href.endsWith("/")){a.target="_self";}
-            else{a.target="_blank"; a.rel="noopener";}
-          });
-          </script>'
-          find Library_of_Alexandria -name "index.html" -type f -exec sh -c 'echo "$0" >> "$1"' "$JS" {} \;
-
-      - name: Commit generated index files
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "Auto-update directory indexes with folder/file JS"
-          branch: main
+    - name: Commit generated index files
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "Auto-update directory indexes"
+        branch: main
