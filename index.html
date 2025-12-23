@@ -3,48 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Учителската библиотека</title>
-<style>
-  /* Toggle styling */
-  .toggle-container {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    font-size: 1.2em; /* bigger than list */
-    background-color: #fff;
-    padding: 5px 10px;
-    border-radius: 8px;
-    border: 1px solid #888;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-  }
-  /* List styling */
-  ul {
-    list-style: none;
-    padding-left: 0;
-  }
-  li {
-    margin-bottom: 10px;
-    font-size: 1em;
-  }
-  a {
-    text-decoration: none;
-    color: #0077cc;
-  }
-  a:hover {
-    text-decoration: underline;
-  }
-</style>
 </head>
 <body>
-
-<!-- Toggle -->
-<div class="toggle-container">
-  <label>
-    <input type="checkbox" id="sameTabToggle">
-    Отваряй линковете в същия таб
-  </label>
-</div>
-
 <h1>Учителската библиотека/TeacherLibraryBG</h1>
 <i><p>*Кликнете на една от категориите:</p></i>
 <ul>
@@ -63,29 +23,5 @@
 </ul>
 <hr>
 <small>Последно обновено: 2025</small>
-
-<!-- Toggle script -->
-<script>
-  const toggle = document.getElementById('sameTabToggle');
-  const links = document.querySelectorAll('a');
-
-  // load saved preference
-  const sameTab = localStorage.getItem('sameTab') === 'true';
-  toggle.checked = sameTab;
-  apply(sameTab);
-
-  toggle.addEventListener('change', () => {
-    localStorage.setItem('sameTab', toggle.checked);
-    apply(toggle.checked);
-  });
-
-  function apply(sameTab) {
-    links.forEach(a => {
-      a.target = sameTab ? '_self' : '_blank';
-      a.rel = 'noopener';
-    });
-  }
-</script>
-
 </body>
 </html>
