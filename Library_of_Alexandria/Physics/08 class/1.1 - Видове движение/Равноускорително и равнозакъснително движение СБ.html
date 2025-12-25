@@ -1,0 +1,195 @@
+<!-- Created by Silvy Evtimov Banzhov, 12.2025 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title> Неравномерно праволинейно движение </title>
+<style>
+  body { font-family: sans-serif; margin:0; padding:0; display:flex; height:100vh; }
+  #controls { width:40%; background:#f0f0f0; padding:40px; box-sizing:border-box; }
+  #controls h2 { font-size:32px; margin-bottom:30px; }
+  .control-label { display:block; margin:20px 0 10px; font-size:28px; }
+  .control-input { font-size:28px; width:100%; padding:8px; }
+  #controls button { font-size:28px; padding:10px 20px; margin-top:20px; cursor:pointer; }
+  #info { font-size:28px; margin-top:20px; }
+  #note { font-size:22px; margin-top:20px; font-style:italic; color:#333; }
+  #visual { width:60%; background:#eef; display:flex; justify-content:center; align-items:center; border-left:3px solid #ccc; position: relative; }
+  #canvas { border:1px solid #333; background:#eef; width:90%; height:90%; }
+  #velocityBox {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    background: rgba(255,255,255,0.8);
+    border:1px solid #333;
+    padding: 10px 20px;
+    font-size: 24px;
+    font-weight:bold;
+  }
+</style>
+</head>
+<body>
+
+<div id="controls">
+  <h2 id="title"> Неравномерно праволинейно движение  </h2>
+
+  <label class="control-label" id="labelSpeed">Initial Speed (m/s) / Начална скорост (м/с):
+    <input type="number" id="speed" class="control-input" value="5">
+  </label>
+
+  <label class="control-label" id="labelAccel">Acceleration (m/s²) / Ускорение (м/с²):
+    <input type="number" id="accel" class="control-input" value="-1">
+  </label>
+
+  <label class="control-label" id="labelDistance">Distance (m) / Разстояние (м):
+    <input type="number" id="distance" class="control-input" value="20">
+  </label>
+
+  <button id="startBtn" onclick="startMotion()">Start / Старт</button>
+  <button id="langBtn" onclick="toggleLanguage()">BG/EN</button>
+
+  <p id="info"></p>
+  <p id="note">Accelerated motion: velocity changes over time, no resistance / Ускорено движение: скоростта се променя с времето, без съпротивление</p>
+</div>
+
+<div id="visual">
+  <canvas id="canvas" width="800" height="200"></canvas>
+  <div id="velocityBox">v: 0.00 m/s</div>
+</div>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const velocityBox = document.getElementById('velocityBox');
+let x=0, animation;
+let lang='EN';
+
+function getStopMessage(t,x,t_stop,s_stop){
+    if(lang==='EN'){
+        return `Stopped! Time: ${t.toFixed(2)} s, Distance: ${x.toFixed(2)} m<br>Stopping formula: t_stop = ${t_stop.toFixed(2)} s, s_stop = ${s_stop.toFixed(2)} m`;
+    } else {
+        return `Спря! Време: ${t.toFixed(2)} с, Разстояние: ${x.toFixed(2)} м<br>Формула за спиране: t_stop = ${t_stop.toFixed(2)} с, s_stop = ${s_stop.toFixed(2)} м`;
+    }
+}
+
+function getArrivedMessage(t,v){
+    if(lang==='EN'){
+        return `Arrived! Time: ${t.toFixed(2)} s, Final speed: ${v.toFixed(2)} m/s`;
+    } else {
+        return `Пристигна! Време: ${t.toFixed(2)} с, Крайна скорост: ${v.toFixed(2)} м/с`;
+    }
+}
+
+function startMotion(){
+    cancelAnimationFrame(animation);
+    x=0;
+
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+
+    let v0 = parseFloat(document.getElementById('speed').value);
+    let a = parseFloat(document.getElementById('accel').value);
+    const distance = parseFloat(document.getElementById('distance').value);
+    const scale = canvas.width / distance;
+    const dt = 0.02;
+    let t=0;
+    const info = document.getElementById('info');
+    let v = v0;
+
+    // Stopping formulas
+    let t_stop = (a !==0) ? Math.abs(v0 / a) : 0;
+    let s_stop = (a !==0) ? (v0*v0)/(2*Math.abs(a)) : 0;
+
+    function animate(){
+        v += a*dt;
+        x += v*dt;
+        t += dt;
+
+        // Stop at zero velocity
+        if ((v0>0 && v<=0 && a<0) || (v0<0 && v>=0 && a>0)){
+            v=0;
+            x = Math.min(Math.max(x,0), distance);
+            info.innerHTML = getStopMessage(t,x,t_stop,s_stop);
+            draw();
+            return;
+        }
+
+        // Stop at target distance
+        if (x >= distance){
+            x=distance;
+            info.innerHTML = getArrivedMessage(t,v);
+            draw();
+            return;
+        }
+
+        draw();
+        animation = requestAnimationFrame(animate);
+    }
+
+    function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        // --- Marker every second ---
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 2;
+        ctx.font = '18px sans-serif';
+        ctx.fillStyle = '#000';
+        let tempX = 0, tempV = v0;
+        for(let s = 1; s <= 100; s++){
+    // velocity at second s
+    let v_s = v0 + a * s;
+
+    // stop markers when velocity reaches zero
+    if ((v0 > 0 && v_s <= 0 && a < 0) || (v0 < 0 && v_s >= 0 && a > 0)) break;
+
+    // position at exact second s (CORRECT FORMULA)
+    let x_s = v0 * s + 0.5 * a * s * s;
+
+    if (x_s < 0) break;
+
+    let pos = x_s * scale;
+    if (pos > canvas.width) break;
+
+    ctx.beginPath();
+    ctx.moveTo(pos, 0);
+    ctx.lineTo(pos, canvas.height);
+    ctx.stroke();
+
+    ctx.fillText(`${s}s`, pos + 4, 22);
+}
+
+
+        // --- Moving block ---
+        ctx.fillStyle='green';
+        ctx.fillRect(x*scale, canvas.height/2-15, 30, 30);
+
+        // --- Velocity box ---
+        velocityBox.innerText = `v: ${v.toFixed(2)} ${lang==='EN'?'m/s':'м/с'}`;
+    }
+
+    animate();
+}
+
+// --- Language toggle ---
+function toggleLanguage(){
+    lang = (lang==='EN') ? 'BG' : 'EN';
+    if(lang==='EN'){
+        document.getElementById('title').innerText='Accelerated Motion Simulator';
+        document.getElementById('labelSpeed').innerHTML='Initial Speed (m/s): <input type="number" id="speed" class="control-input" value="'+document.getElementById('speed').value+'">';
+        document.getElementById('labelAccel').innerHTML='Acceleration (m/s²): <input type="number" id="accel" class="control-input" value="'+document.getElementById('accel').value+'">';
+        document.getElementById('labelDistance').innerHTML='Distance (m): <input type="number" id="distance" class="control-input" value="'+document.getElementById('distance').value+'">';
+        document.getElementById('startBtn').innerText='Start';
+        document.getElementById('langBtn').innerText='BG';
+        document.getElementById('note').innerText='Accelerated motion: velocity changes over time, no resistance';
+    } else {
+        document.getElementById('title').innerText='Ускорено движение';
+        document.getElementById('labelSpeed').innerHTML='Начална скорост (м/с): <input type="number" id="speed" class="control-input" value="'+document.getElementById('speed').value+'">';
+        document.getElementById('labelAccel').innerHTML='Ускорение (м/с²): <input type="number" id="accel" class="control-input" value="'+document.getElementById('accel').value+'">';
+        document.getElementById('labelDistance').innerHTML='Разстояние (м): <input type="number" id="distance" class="control-input" value="'+document.getElementById('distance').value+'">';
+        document.getElementById('startBtn').innerText='Старт';
+        document.getElementById('langBtn').innerText='EN';
+        document.getElementById('note').innerText='Ускорено движение: скоростта се променя с времето, без съпротивление';
+    }
+}
+</script>
+</body>
+</html>
