@@ -1,0 +1,200 @@
+<!-- Created by Silvy Evtimov Banzhov, 12.2025 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Forces and Newton's Laws / Сили и закони на Нютон</title>
+
+<style>
+body {
+  margin:0;
+  font-family:sans-serif;
+  display:flex;
+  height:100vh;
+}
+#controls {
+  width:40%;
+  padding:40px;
+  background:#f0f0f0;
+  box-sizing:border-box;
+}
+#controls h2 { font-size:32px; margin-bottom:30px; }
+label { font-size:24px; display:block; margin-top:15px; }
+input { font-size:24px; width:100%; padding:6px; }
+button { font-size:24px; padding:10px 20px; margin-top:20px; cursor:pointer; }
+#note { font-size:20px; font-style:italic; margin-top:15px; }
+
+#visual {
+  width:60%;
+  background:#eef;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-left:3px solid #ccc;
+  position:relative;
+}
+#canvas {
+  width:90%;
+  height:90%;
+  border:1px solid #333;
+}
+#workBox {
+  position:absolute;
+  top:10px;
+  right:20px;
+  background:rgba(255,255,255,0.85);
+  padding:10px 15px;
+  border:1px solid #333;
+  font-size:22px;
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<div id="controls">
+<h2 id="title">Forces and Newton's Laws</h2>
+
+<label id="lm">Mass (kg):
+<input id="mass" type="number" value="5"></label>
+
+<label>F → <input id="fxp" type="number" value="10"></label>
+<label>F ← <input id="fxn" type="number" value="0"></label>
+<label>F ↑ <input id="fyp" type="number" value="0"></label>
+<label>F ↓ <input id="fyn" type="number" value="0"></label>
+
+<button id="start" onclick="start()">Start</button>
+<button onclick="toggleLang()">BG / EN</button>
+
+<p id="note">Motion is in vacuum, no resistance</p>
+</div>
+
+<div id="visual">
+<canvas id="canvas"></canvas>
+<div id="workBox">Work W: 0 J</div>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+let lang="EN", anim;
+
+function start(){
+ cancelAnimationFrame(anim);
+ canvas.width = canvas.clientWidth;
+ canvas.height = canvas.clientHeight;
+
+ let m = +mass.value;
+ let Fx = +fxp.value - +fxn.value;
+ let Fy = +fyp.value - +fyn.value;
+
+ let ax = Fx/m;
+ let ay = Fy/m;
+
+ let x = canvas.width/2;
+ let y = canvas.height/2;
+ let vx=0, vy=0;
+ let dt=0.02;
+ let trail=[];
+ let work=0;
+
+ function drawArrow(cx, cy, dx, dy, color, label){
+  let L = Math.hypot(dx, dy);
+  if (L === 0) return;
+
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 4;
+
+  // main line
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx + dx, cy + dy);
+  ctx.stroke();
+
+  // arrowhead
+  let a = Math.atan2(dy, dx);
+  ctx.beginPath();
+  ctx.moveTo(cx + dx, cy + dy);
+  ctx.lineTo(cx + dx - 12*Math.cos(a - 0.4), cy + dy - 12*Math.sin(a - 0.4));
+  ctx.lineTo(cx + dx - 12*Math.cos(a + 0.4), cy + dy - 12*Math.sin(a + 0.4));
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+
+  // label offset perpendicular to arrow
+  let nx = -dy / L; // normal vector
+  let ny =  dx / L;
+
+  const labelOffset = 16;
+
+  ctx.fillStyle = color;
+  ctx.font = "18px sans-serif";
+  ctx.fillText(
+    label,
+    cx + dx + nx * labelOffset,
+    cy + dy + ny * labelOffset
+  );
+}
+
+
+ function animate(){
+   vx+=ax*dt;
+   vy+=ay*dt;
+
+   x+=vx*dt*50;
+   y-=vy*dt*50;
+
+   if(x<0||x>canvas.width-30){vx=0;ax=0;}
+   if(y<0||y>canvas.height-30){vy=0;ay=0;}
+
+   let dW=Math.abs(Fx*vx*dt + Fy*vy*dt);
+   work+=dW;
+   workBox.innerHTML=(lang==="EN"?"Work W: ":"Работа A: ")+work.toFixed(2)+" J";
+
+   trail.push({x:x+15,y:y+15});
+
+   ctx.clearRect(0,0,canvas.width,canvas.height);
+
+   // trail
+   if(trail.length>1){
+     ctx.beginPath();
+     ctx.moveTo(trail[0].x,trail[0].y);
+     trail.forEach(p=>ctx.lineTo(p.x,p.y));
+     ctx.strokeStyle="black";
+     ctx.lineWidth=2;
+     ctx.stroke();
+   }
+
+   // square
+   ctx.fillStyle="red";
+   ctx.fillRect(x,y,30,30);
+
+   let cx=x+15, cy=y+15, s=3;
+
+   // component forces (blue)
+   drawArrow(cx,cy, fxp.value*s,0,"blue",fxp.value+" N");
+   drawArrow(cx,cy,-fxn.value*s,0,"blue",fxn.value+" N");
+   drawArrow(cx,cy,0,-fyp.value*s,"blue",fyp.value+" N");
+   drawArrow(cx,cy,0, fyn.value*s,"blue",fyn.value+" N");
+
+   // resultant (red)
+   let Fres=Math.hypot(Fx,Fy);
+   drawArrow(cx,cy,Fx*s,Fy*-s,"red",Fres.toFixed(1)+" N");
+
+   anim=requestAnimationFrame(animate);
+ }
+ animate();
+}
+
+function toggleLang(){
+ lang=lang==="EN"?"BG":"EN";
+ title.innerText=lang==="EN"?"Forces and Newton's Laws":"Сили и закони на Нютон";
+ lm.innerHTML=lang==="EN"?"Mass (kg):<input id='mass' type='number' value='"+mass.value+"'>":
+ "Маса (кг):<input id='mass' type='number' value='"+mass.value+"'>";
+ note.innerText=lang==="EN"?"Motion is in vacuum, no resistance":
+ "Движение във вакуум, без съпротивление";
+}
+</script>
+</body>
+</html>
